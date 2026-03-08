@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>学信网</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --chsi-green: #12b794; /* 学信网主色调绿 */
+            --chsi-cyan: #00c2b3;  /* 辅助青色 */
+            --chsi-blue: #3296fa;  /* 学历蓝 */
+            --bg-gray: #f7f8fa;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-gray); -webkit-tap-highlight-color: transparent; margin: 0; padding: 0;}
+        .tab-bar { border-top: 1px solid #eee; height: 60px; padding-bottom: env(safe-area-inset-bottom); }
+        .edit-mode [contenteditable="true"] { outline: 1px dashed #ff0000; background: rgba(255,0,0,0.05); }
+        .edit-mode .draggable { cursor: move; outline: 1px dotted #3296fa; }
+        .edit-mode img { cursor: pointer; border: 2px dashed #ff0000; }
+        #hidden-edit-trigger { position: fixed; top: 0; left: 0; width: 40px; height: 40px; z-index: 9999; background: transparent; }
+        .page { display: none; height: 100vh; overflow-y: auto; padding-bottom: 70px; box-sizing: border-box; background: var(--bg-gray); }
+        .page.active { display: block; }
+        .page-no-tab { padding-bottom: 0; }
+        .chsi-header { background: white; text-align: center; font-weight: bold; font-size: 1.125rem; padding: 12px 16px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; items-center;}
+        .green-header { background: var(--chsi-green); color: white; padding: 12px 16px; display: flex; align-items: center; position: sticky; top: 0; z-index: 10; font-size: 1.1rem;}
+        
+        /* 自定义滚动条隐藏 */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="hidden-edit-trigger" onclick="toggleEditMode()"></div>
+
+<div id="app">
+    
+    <div id="page-home" class="page active">
+        <div class="chsi-header">
+            <span class="w-6"></span>
+            <span contenteditable="false">学信网</span>
+            <span class="w-6 text-right">[-]</span> </div>
+        
+        <div class="p-4 bg-white mt-2">
+            <h3 class="font-bold mb-4 text-lg" contenteditable="false">学籍学历学位</h3>
+            <div class="grid grid-cols-4 gap-y-6 gap-x-2 text-xs text-center sortable-area">
+                <div class="draggable" onclick="navigateTo('page-archive')">
+                    <img src="https://via.placeholder.com/100/e0f2f1/12b794?text=学籍" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">学籍查询</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e0f2f1/12b794?text=验证" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">学籍验证</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e3f2fd/3296fa?text=学历" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">学历查询</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e3f2fd/3296fa?text=验证" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">学历验证</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e3f2fd/3296fa?text=认证" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">学历认证</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e8eaf6/3f51b5?text=学位" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">学位查询</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e8eaf6/3f51b5?text=验证" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">学位验证</div>
+                </div>
+            </div>
+            
+            <div class="mt-6 rounded-xl overflow-hidden draggable" onclick="showError()">
+                <img src="https://via.placeholder.com/800x200/e6f7f0/12b794?text=在线考试系统" class="w-full h-20 object-cover">
+            </div>
+        </div>
+
+        <div class="p-4 bg-white mt-2">
+            <h3 class="font-bold mb-4 text-lg" contenteditable="false">出国教育背景信息服务</h3>
+            <div class="grid grid-cols-3 gap-y-6 gap-x-2 text-xs text-center sortable-area">
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e0f7fa/00bcd4?text=中等" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">中等教育学历</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e3f2fd/3296fa?text=100" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">高等教育成绩单</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e0f7fa/00bcd4?text=100" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">高考成绩单</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/e8f5e9/4caf50?text=100" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">中学成绩单</div>
+                </div>
+                <div class="draggable" onclick="showError()">
+                    <img src="https://via.placeholder.com/100/fff3e0/ff9800?text=100" class="w-12 h-12 rounded-2xl mx-auto mb-2 object-cover">
+                    <div contenteditable="false">会考成绩单</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-news" class="page">
+        <div class="chsi-header">
+            <span class="w-6"></span>
+            <span contenteditable="false">新闻</span>
+            <span class="w-6 text-right">[-]</span>
+        </div>
+        <div class="bg-white divide-y sortable-area">
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">浙江 2026 三位一体招生开启！报考要点速览</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">03-05 15:13:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">2026 年对调剂考生的基本要求</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-28 15:04:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">教育部部署 2026 年全国硕士研究生招生复试录取工作</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-28 10:38:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">关于山东省 2026 年硕士研究生招生考试初试成绩公布有关事宜的公告</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-27 09:25:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">青海省 2026 年全国硕士研究生招生考试（初试）成绩发布公告</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-27 09:22:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">海南省 2026 年全国硕士研究生招生考试（初试）成绩查询的公告</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-27 09:05:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">贵州省 2026 年全国硕士研究生招生考试（初试）成绩发布通告</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-26 19:54:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">湖北省 2026 年全国硕士研究生招生考试（初试）成绩公布及复核办法</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-26 19:52:00</div>
+            </div>
+            <div class="p-4 draggable" onclick="showError()">
+                <div class="text-[15px] text-gray-800 leading-relaxed" contenteditable="false">关于宁夏 2026 年全国硕士研究生招生考试初试成绩查询及有关工作</div>
+                <div class="text-gray-400 text-xs mt-2" contenteditable="false">02-26 18:00:00</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-profile" class="page">
+        <div class="chsi-header justify-center">
+            <span contenteditable="false">我的</span>
+        </div>
+        <div class="bg-white p-5 flex items-center mb-3 mt-2 relative">
+            <img src="https://via.placeholder.com/150/b0bec5/ffffff?text=头像" class="w-16 h-16 rounded-full object-cover mr-4 draggable">
+            <div>
+                <div class="font-bold text-xl mb-1 text-gray-800" contenteditable="false">夏瑞</div>
+                <div class="text-gray-500 text-sm" contenteditable="false">130******63</div>
+            </div>
+            <div class="absolute right-5 top-8 flex items-center text-[#00c2b3] text-[10px] border border-[#00c2b3] px-1.5 py-0.5 rounded bg-[#e6f9f7]">
+                <span class="mr-1">👤</span><span contenteditable="false">已实人验证</span>
+            </div>
+        </div>
+        
+        <div class="bg-white divide-y">
+            <div class="p-4 flex justify-between items-center draggable" onclick="showError()">
+                <div class="flex items-center text-gray-700"><span class="mr-3 w-5 text-center text-blue-500 font-bold">!</span> <span contenteditable="false">关于</span></div>
+                <span class="text-gray-300">〉</span>
+            </div>
+            <div class="p-4 flex justify-between items-center draggable" onclick="showError()">
+                <div class="flex items-center text-gray-700"><span class="mr-3 w-5 text-center text-green-500 font-bold">?</span> <span contenteditable="false">帮助中心</span></div>
+                <span class="text-gray-300">〉</span>
+            </div>
+            <div class="p-4 flex justify-between items-center draggable" onclick="showError()">
+                <div class="flex items-center text-gray-700"><span class="mr-3 w-5 text-center text-orange-500 font-bold">⏻</span> <span contenteditable="false">注销账号</span></div>
+                <span class="text-gray-300">〉</span>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center text-gray-600 py-4 bg-white draggable" onclick="showError()" contenteditable="false">
+            退出登录
+        </div>
+    </div>
+
+    <div id="page-archive" class="page page-no-tab">
+        <div class="green-header">
+            <span onclick="navigateTo('page-home')" class="w-10 text-xl">〈</span>
+            <span class="flex-1 text-center font-bold" contenteditable="false">学信档案</span>
+            <span class="w-10 text-right text-xl">×</span>
+        </div>
+        
+        <div class="p-3 sortable-area">
+            <div class="bg-white rounded-xl p-4 mb-3 flex justify-between items-center shadow-sm draggable" onclick="showError()">
+                <div>
+                    <div class="flex items-center mb-1">
+                        <span class="text-gray-800 font-bold text-base mr-2" contenteditable="false">院校满意度</span>
+                        <span class="text-[10px] bg-orange-100 text-orange-500 px-1.5 py-0.5 rounded" contenteditable="false">累计投票 16607</span>
+                    </div>
+                    <div class="text-xs text-gray-500" contenteditable="false">南昌工学院-视觉传达设计</div>
+                </div>
+                <button class="bg-[#12b794] text-white text-xs px-4 py-1.5 rounded-full" contenteditable="false">去评价</button>
+            </div>
+            
+            <div class="bg-white rounded-xl p-4 mb-3 flex justify-between items-center shadow-sm draggable" onclick="showError()">
+                <div>
+                    <div class="text-gray-800 font-bold text-base mb-1" contenteditable="false">新媒体运营-2026届校园招聘</div>
+                    <div class="flex items-center">
+                        <span class="text-orange-500 text-sm mr-2" contenteditable="false">6.0k-10.0k</span>
+                        <span class="text-[10px] bg-green-50 text-[#12b794] px-1.5 py-0.5 rounded" contenteditable="false">本科及以上</span>
+                    </div>
+                </div>
+                <button class="bg-[#12b794] text-white text-xs px-4 py-1.5 rounded-full" contenteditable="false">更多职位</button>
+            </div>
+            
+            <div class="mb-4 rounded-xl overflow-hidden shadow-sm draggable" onclick="showError()">
+                <img src="https://via.placeholder.com/800x200/e8eaf6/5c6bc0?text=职场实习" class="w-full h-20 object-cover">
+            </div>
+
+            <div class="grid grid-cols-3 gap-y-6 text-xs text-center pb-8 bg-white rounded-xl pt-6">
+                 <div class="draggable flex flex-col items-center" onclick="navigateTo('page-hiedu')">
+                     <img src="https://via.placeholder.com/100/12b794/ffffff?text=🎓" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">高等教育信息</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/12b794/ffffff?text=✓" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">在线验证报告</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/12b794/ffffff?text=📄" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">学历学位认证<br>与成绩验证</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/3296fa/ffffff?text=🌍" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">出国（境）报告<br>发送</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/12b794/ffffff?text=👤" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">毕业证书图像<br>校对</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/12b794/ffffff?text=Offer" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">就业</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/ffb300/ffffff?text=😊" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">学校满意度</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/3296fa/ffffff?text=✓" class="w-10 h-10 rounded-full mb-2">
+                     <div contenteditable="false" class="text-gray-700">个人测评</div>
+                 </div>
+                 <div class="draggable flex flex-col items-center" onclick="showError()">
+                     <img src="https://via.placeholder.com/100/3296fa/ffffff?text=双千" class="w-10 h-10 rounded mb-2">
+                     <div contenteditable="false" class="text-gray-700">“双千”计划<br>“微专业”</div>
+                 </div>
+            </div>
+        </div>
+        
+        <div class="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around items-center text-[10px] text-gray-500 pb-safe pt-1 h-14 z-50">
+            <div class="flex flex-col items-center text-[#12b794]">
+                <span class="text-xl mb-0.5">🏠</span><span contenteditable="false">首页</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-xl mb-0.5">🎓</span><span contenteditable="false">学籍学历学位</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-xl mb-0.5">☑️</span><span contenteditable="false">个人测评</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-xl mb-0.5">💼</span><span contenteditable="false">求职招聘</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-xl mb-0.5">👤</span><span contenteditable="false">我的</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-hiedu" class="page page-no-tab">
+        <div class="green-header">
+            <span onclick="navigateTo('page-archive')" class="w-10 text-xl">〈</span>
+            <span class="flex-1 text-center font-bold" contenteditable="false">高等教育信息</span>
+            <span class="w-10 text-right text-xl">×</span>
+        </div>
+        
+        <div class="m-3 rounded-lg overflow-hidden draggable" onclick="showError()">
+            <img src="https://via.placeholder.com/800x160/4dd0e1/ffffff?text=专业推荐" class="w-full h-16 object-cover">
+        </div>
+
+        <div class="p-4 pt-0 sortable-area">
+            <div class="mb-6 draggable">
+                <div class="flex justify-between items-end mb-2">
+                    <span class="text-gray-700 text-[15px]" contenteditable="false">学籍信息 (1)</span>
+                    <span class="text-gray-400 text-xs flex items-center" contenteditable="false">还有学籍没有显示出来？ <span class="text-[#12b794] ml-1">尝试绑定</span></span>
+                </div>
+                <div class="bg-[#12b794] text-white p-5 rounded-xl shadow relative" onclick="navigateTo('page-detail')">
+                    <div class="text-lg mb-1" contenteditable="false">南昌工学院</div>
+                    <div class="text-xs opacity-90" contenteditable="false">视觉传达设计 | 普通全日制</div>
+                    <div class="absolute right-4 top-4 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full" contenteditable="false">本科</div>
+                </div>
+            </div>
+
+            <div class="mb-6 draggable">
+                <div class="flex justify-between items-end mb-2">
+                    <span class="text-gray-700 text-[15px]" contenteditable="false">学历信息 (1)</span>
+                    <span class="text-gray-400 text-xs flex items-center" contenteditable="false">还有学历没有显示出来？ <span class="text-[#12b794] ml-1">尝试绑定</span></span>
+                </div>
+                <div class="bg-[#3b82f6] text-white p-5 rounded-xl shadow relative" onclick="showError()">
+                    <div class="text-lg mb-1" contenteditable="false">南昌工学院</div>
+                    <div class="text-xs opacity-90" contenteditable="false">视觉传达设计 | 普通全日制</div>
+                    <div class="absolute right-4 top-4 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full" contenteditable="false">本科</div>
+                </div>
+            </div>
+
+            <div class="mb-6 draggable">
+                <div class="flex justify-between items-end mb-2">
+                    <span class="text-gray-700 text-[15px]" contenteditable="false">学位信息</span>
+                    <span class="text-gray-400 text-xs flex items-center" contenteditable="false">还有学位没有显示出来？ <span class="text-[#12b794] ml-1">尝试绑定</span></span>
+                </div>
+                <div class="bg-white border rounded-xl p-5 text-center shadow-sm" onclick="showError()">
+                    <div class="text-gray-600 text-sm mb-4 leading-relaxed" contenteditable="false">您还未绑定学位信息，可以使用“尝试<br>绑定学位”功能绑定您的学位 <span class="text-gray-400 border border-gray-400 rounded-full w-4 h-4 inline-block text-[10px] leading-4 text-center">?</span></div>
+                    <div class="text-[#12b794] text-xs border-t pt-3" contenteditable="false">提示信息 ∨</div>
+                </div>
+            </div>
+
+            <div class="mb-6 draggable">
+                <div class="mb-2">
+                    <span class="text-gray-700 text-[15px]" contenteditable="false">考研信息</span>
+                </div>
+                <div class="bg-white border rounded-xl p-6 text-center shadow-sm" onclick="showError()">
+                    <div class="text-gray-800 text-base mb-2 font-medium" contenteditable="false">您没有考研信息！</div>
+                    <div class="text-gray-400 text-xs leading-relaxed" contenteditable="false">您目前没有考研信息，系统提供2006年以来入学的硕士研究生报名和成绩数据。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-detail" class="page page-no-tab">
+        <div class="green-header">
+            <span onclick="navigateTo('page-hiedu')" class="w-10 text-xl">〈</span>
+            <span class="flex-1"></span>
+            <span class="w-10 text-right text-xl">×</span>
+        </div>
+        
+        <div class="bg-[#12b794] px-4 pt-2 pb-6 text-white relative shadow-md">
+            <div class="flex mb-4">
+                <div class="flex space-x-2 mr-4">
+                    <div class="flex flex-col items-center">
+                        <img src="https://via.placeholder.com/80x110/3b82f6/ffffff?text=录取" class="w-[60px] h-[80px] rounded object-cover border border-white/30 draggable">
+                        <span class="text-[10px] mt-1" contenteditable="false">录取照片</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <img src="https://via.placeholder.com/80x110/b0bec5/ffffff?text=学历" class="w-[60px] h-[80px] rounded object-cover border border-white/30 draggable">
+                        <span class="text-[10px] mt-1" contenteditable="false">学历照片</span>
+                    </div>
+                </div>
+                <div class="flex-1 pt-1">
+                    <div class="text-xl font-bold mb-1" contenteditable="false">夏瑞</div>
+                    <div class="text-sm opacity-90 mb-4" contenteditable="false">男 2001年12月06日</div>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/20 pt-4 relative">
+                <div class="text-lg mb-1" contenteditable="false">南昌工学院</div>
+                <div class="text-xs opacity-90" contenteditable="false">视觉传达设计 | 普通全日制</div>
+                <div class="absolute right-0 top-4 bg-white/20 text-white text-xs px-2 py-0.5 rounded-full" contenteditable="false">本科</div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 pb-24 text-[15px] sortable-area">
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">民族</span><span class="text-gray-800 flex-1" contenteditable="false">汉族</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">证件号码</span><span class="text-gray-800 flex-1" contenteditable="false">320724200112063031</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">学制</span><span class="text-gray-800 flex-1" contenteditable="false">4 年</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">学历类别</span><span class="text-gray-800 flex-1" contenteditable="false">普通高等教育</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">分院</span><span class="text-gray-800 flex-1" contenteditable="false">艺术与传媒设计学院</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">系所</span><span class="text-gray-800 flex-1" contenteditable="false"></span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">班级</span><span class="text-gray-800 flex-1" contenteditable="false">传设A2133班</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">学号</span><span class="text-gray-800 flex-1" contenteditable="false">21051130302</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">入学日期</span><span class="text-gray-800 flex-1" contenteditable="false">2021年09月01日</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">学籍状态</span><span class="text-gray-800 flex-1" contenteditable="false">不在籍（毕业）</span></div>
+            <div class="py-3 flex draggable"><span class="text-gray-500 w-24">离校日期</span><span class="text-gray-800 flex-1" contenteditable="false">2025年06月10日</span></div>
+        </div>
+
+        <div class="fixed bottom-0 left-0 w-full bg-white p-3 border-t">
+            <button class="w-full bg-[#12b794] text-white text-center py-3 rounded text-[15px]" onclick="showError()" contenteditable="false">查看验证报告</button>
+        </div>
+    </div>
+
+    <div id="main-tab-bar" class="fixed bottom-0 left-0 w-full bg-white tab-bar flex justify-around items-center text-[10px] text-gray-500 z-50">
+        <div onclick="navigateTo('page-home')" class="flex flex-col items-center nav-item pt-1" id="nav-home">
+            <svg class="w-6 h-6 mb-0.5 icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L4 9v12h5v-7h6v7h5V9z"/></svg>
+            <span contenteditable="false">首页</span>
+        </div>
+        <div onclick="navigateTo('page-news')" class="flex flex-col items-center nav-item pt-1" id="nav-news">
+            <svg class="w-6 h-6 mb-0.5 icon" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            <span contenteditable="false">新闻</span>
+        </div>
+        <div onclick="navigateTo('page-profile')" class="flex flex-col items-center nav-item pt-1" id="nav-profile">
+            <svg class="w-6 h-6 mb-0.5 icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span contenteditable="false">我的</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let isEditMode = false;
+    let sortables = [];
+
+    function navigateTo(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        // 控制主导航栏的显示和颜色
+        const mainTabBar = document.getElementById('main-tab-bar');
+        if(['page-home', 'page-news', 'page-profile'].includes(pageId)) {
+            mainTabBar.style.display = 'flex';
+            document.querySelectorAll('.nav-item').forEach(n => n.style.color = '#6b7280'); // text-gray-500
+            
+            if(pageId === 'page-home') document.getElementById('nav-home').style.color = '#00c2b3';
+            if(pageId === 'page-news') document.getElementById('nav-news').style.color = '#00c2b3';
+            if(pageId === 'page-profile') document.getElementById('nav-profile').style.color = '#00c2b3';
+        } else {
+            mainTabBar.style.display = 'none';
+        }
+    }
+
+    function showError() {
+        if(isEditMode) return; // 编辑模式下不弹窗打断
+        alert("网络不稳定，请稍后再试");
+    }
+
+    // 图片点击替换逻辑
+    function setupImageReplacement() {
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            img.onclick = function(e) {
+                if(isEditMode) {
+                    e.stopPropagation(); // 阻止触发父元素的点击事件（如页面跳转）
+                    const newUrl = prompt("请输入新的图片网络链接 (URL):", img.src);
+                    if (newUrl && newUrl.trim() !== "") {
+                        img.src = newUrl;
+                    }
+                }
+            };
+        });
+    }
+
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        const app = document.getElementById('app');
+        
+        if (isEditMode) {
+            app.classList.add('edit-mode');
+            // 允许编辑文本
+            document.querySelectorAll('[contenteditable]').forEach(el => el.contentEditable = "true");
+            
+            // 启用拖拽排序
+            document.querySelectorAll('.sortable-area').forEach(el => {
+                const s = new Sortable(el, { 
+                    animation: 150, 
+                    ghostClass: 'opacity-50',
+                    delay: 100, // 增加延迟防止与点击冲突
+                    delayOnTouchOnly: true
+                });
+                sortables.push(s);
+            });
+            
+            setupImageReplacement();
+            alert("🛠 修改模式已开启！\n\n1. 点击任何文字可直接修改\n2. 点击任何图片/图标可替换成你的图片链接\n3. 长按模块可上下左右拖动位置\n\n再次点击左上角隐藏按钮即可关闭。");
+        } else {
+            app.classList.remove('edit-mode');
+            document.querySelectorAll('[contenteditable]').forEach(el => el.contentEditable = "false");
+            sortables.forEach(s => s.destroy());
+            sortables = [];
+            // 取消图片的特殊点击事件
+            document.querySelectorAll('img').forEach(img => img.onclick = null);
+            alert("修改模式已关闭，已恢复正常预览效果。");
+        }
+    }
+
+    // 初始化显示主页
+    navigateTo('page-home');
+</script>
+
+</body>
+</html>
